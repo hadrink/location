@@ -21,6 +21,8 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     override init() {
         super.init()
         locationManager.delegate = self
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
     }
     
     func startMonitoringRegion(regionToMonitor: RegionToMonitor) {
@@ -107,9 +109,12 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
+        //-- if UserDefault inside_region == true && !george_clooney_inside  {
+        //--    stopUpdating
+        //--    request userInsidePolygon -> george_clooney_inside
+        //-- } else 
+        
         locationManager.stopUpdatingLocation()
-        manager.pausesLocationUpdatesAutomatically = false
-        manager.allowsBackgroundLocationUpdates = true
         
         for (var i : Int = 0; i < locations.count; i++) {
             let newLocation : CLLocation? = locations[i] as CLLocation
@@ -140,7 +145,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         print("DidStartMonitoringForRegion")
         print(region.identifier)
         
-        //locationManager.requestStateForRegion(region)
+        locationManager.requestStateForRegion(region)
     }
     
     func locationManager(manager: CLLocationManager, didDetermineState state: CLRegionState, forRegion region: CLRegion) {
@@ -174,12 +179,23 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         print(error.description)
     }
     
+    func timerWithStartUpdating() {
+        locationManager.startUpdatingLocation()
+        //-- if UserDefault !george_clooney_inside {
+        //--    create timer on timeWithStartUpdating
+        //-- }
+    }
+    
     func locationManager(manager: CLLocationManager, didEnterRegion region: CLRegion) {
         
         let notification = UILocalNotification()
         notification.alertBody = "Did Enter Region"
         notification.soundName = "Default"
         UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+        
+        //-- stopMonitoringLocationChanges
+        //-- UserDefault -> inside_region = true + synchronize
+        //-- timerWithStartUpdating()
         
     }
     
@@ -189,6 +205,10 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         notification.alertBody = "Did Exit Region"
         notification.soundName = "Default"
         UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+ 
+        //-- stopUpdatingLocation
+        //-- UserDefault -> inside_region = false
+        //-- startMonitoringLocationChanges
         
     }
     

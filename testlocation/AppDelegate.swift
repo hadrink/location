@@ -20,6 +20,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let locationManager = placeManager.locationManager
         locationManager.requestAlwaysAuthorization()
         
+        if launchOptions?[UIApplicationLaunchOptionsLocationKey] != nil {
+            
+            print("It's a location event")
+            let notification = UILocalNotification()
+            notification.alertBody = "Location Event"
+            notification.soundName = "Default"
+            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+            
+            locationManager.startMonitoringSignificantLocationChanges()
+            
+        }
+        
         if application.respondsToSelector("registerUserNotificationSettings:") {
             let settings = UIUserNotificationSettings(forTypes: UIUserNotificationType([.Badge, .Sound, .Alert]), categories: nil)
             application.registerUserNotificationSettings(settings)
@@ -45,8 +57,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //placeManager.locationManager.stopUpdatingLocation()
         
-        self.placeManager.regionToMonitorItems.removeAll()
-        self.placeManager.stopMonitoringRegion()
         self.placeManager.locationManager.startMonitoringSignificantLocationChanges()
 
         
