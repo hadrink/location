@@ -12,10 +12,25 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    let placeManager = PlaceManager()
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        let locationManager = placeManager.locationManager
+        locationManager.requestAlwaysAuthorization()
+        
+        if application.respondsToSelector("registerUserNotificationSettings:") {
+            let settings = UIUserNotificationSettings(forTypes: UIUserNotificationType([.Badge, .Sound, .Alert]), categories: nil)
+            application.registerUserNotificationSettings(settings)
+            application.registerForRemoteNotifications()
+        } else {
+            let types = UIUserNotificationType([.Badge, .Sound, .Alert])
+            application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
+            application.registerForRemoteNotifications()
+        }
+        
+        
         return true
     }
 
@@ -27,6 +42,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        //placeManager.locationManager.stopUpdatingLocation()
+        
+        self.placeManager.regionToMonitorItems.removeAll()
+        self.placeManager.stopMonitoringRegion()
+        self.placeManager.locationManager.startMonitoringSignificantLocationChanges()
+
+        
     }
 
     func applicationWillEnterForeground(application: UIApplication) {

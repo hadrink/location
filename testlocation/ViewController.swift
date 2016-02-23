@@ -9,6 +9,9 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    let placeManager = PlaceManager()
+    //let locationManager = placeManager.locationManager
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +23,9 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    @IBAction func createRegion(sender: UIButton) {
+        self.placeManager.locationManager.startUpdatingLocation()
+    }
 
 }
 

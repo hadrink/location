@@ -14,6 +14,10 @@
 		7A12E68C1C7B463300088177 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A12E68A1C7B463300088177 /* LaunchScreen.storyboard */; };
 		7A12E6971C7B463400088177 /* testlocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12E6961C7B463400088177 /* testlocationTests.swift */; };
 		7A12E6A21C7B463400088177 /* testlocationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12E6A11C7B463400088177 /* testlocationUITests.swift */; };
+		7A12E6B01C7B467200088177 /* RegionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12E6AF1C7B467200088177 /* RegionModel.swift */; };
+		7A12E6B21C7B46BF00088177 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A12E6B11C7B46BF00088177 /* CoreLocation.framework */; };
+		7A12E6B61C7B4BF000088177 /* PlaceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12E6B51C7B4BF000088177 /* PlaceManager.swift */; };
+		7A12E6B81C7B4C9400088177 /* CallRegionAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12E6B71C7B4C9400088177 /* CallRegionAPI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +51,10 @@
 		7A12E69D1C7B463400088177 /* testlocationUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testlocationUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A12E6A11C7B463400088177 /* testlocationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testlocationUITests.swift; sourceTree = "<group>"; };
 		7A12E6A31C7B463400088177 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7A12E6AF1C7B467200088177 /* RegionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegionModel.swift; sourceTree = "<group>"; };
+		7A12E6B11C7B46BF00088177 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		7A12E6B51C7B4BF000088177 /* PlaceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceManager.swift; sourceTree = "<group>"; };
+		7A12E6B71C7B4C9400088177 /* CallRegionAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallRegionAPI.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A12E6B21C7B46BF00088177 /* CoreLocation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +86,7 @@
 		7A12E6751C7B463300088177 = {
 			isa = PBXGroup;
 			children = (
+				7A12E6B11C7B46BF00088177 /* CoreLocation.framework */,
 				7A12E6801C7B463300088177 /* testlocation */,
 				7A12E6951C7B463300088177 /* testlocationTests */,
 				7A12E6A01C7B463400088177 /* testlocationUITests */,
@@ -98,6 +108,9 @@
 			isa = PBXGroup;
 			children = (
 				7A12E6811C7B463300088177 /* AppDelegate.swift */,
+				7A12E6AF1C7B467200088177 /* RegionModel.swift */,
+				7A12E6B51C7B4BF000088177 /* PlaceManager.swift */,
+				7A12E6B71C7B4C9400088177 /* CallRegionAPI.swift */,
 				7A12E6831C7B463300088177 /* ViewController.swift */,
 				7A12E6851C7B463300088177 /* Main.storyboard */,
 				7A12E6881C7B463300088177 /* Assets.xcassets */,
@@ -193,6 +206,11 @@
 				TargetAttributes = {
 					7A12E67D1C7B463300088177 = {
 						CreatedOnToolsVersion = 7.2.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					7A12E6911C7B463300088177 = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -257,6 +275,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				7A12E6841C7B463300088177 /* ViewController.swift in Sources */,
+				7A12E6B61C7B4BF000088177 /* PlaceManager.swift in Sources */,
+				7A12E6B01C7B467200088177 /* RegionModel.swift in Sources */,
+				7A12E6B81C7B4C9400088177 /* CallRegionAPI.swift in Sources */,
 				7A12E6821C7B463300088177 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
