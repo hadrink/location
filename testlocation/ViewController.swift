@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func createRegion(sender: UIButton) {
-        self.placeManager.locationManager.startMonitoringSignificantLocationChanges()
+        self.placeManager.locationManager.startUpdatingLocation()
     }
 
 }
