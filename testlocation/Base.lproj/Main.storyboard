@@ -24,11 +24,20 @@
                                     <action selector="createRegion:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Mza-gB-SL9"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ya4-iC-uRJ">
+                                <rect key="frame" x="248" y="323" width="105" height="30"/>
+                                <state key="normal" title="Display regions"/>
+                                <connections>
+                                    <action selector="displayRegion:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hSs-Ia-BQg"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="g4g-2M-pkr" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="05I-8B-6sG"/>
                             <constraint firstItem="g4g-2M-pkr" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="2jB-rK-94i"/>
+                            <constraint firstItem="Ya4-iC-uRJ" firstAttribute="top" secondItem="g4g-2M-pkr" secondAttribute="bottom" constant="8" symbolic="YES" id="4tK-Go-9Lh"/>
+                            <constraint firstItem="Ya4-iC-uRJ" firstAttribute="centerX" secondItem="g4g-2M-pkr" secondAttribute="centerX" id="duY-rs-kFS"/>
                         </constraints>
                     </view>
                 </viewController>

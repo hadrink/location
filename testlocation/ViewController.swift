@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import CoreLocation
+import Foundation
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CLLocationManagerDelegate {
     
     let placeManager = PlaceManager()
     //let locationManager = placeManager.locationManager
@@ -24,8 +26,17 @@ class ViewController: UIViewController {
     }
 
     @IBAction func createRegion(sender: UIButton) {
+        placeManager.requestState()
         self.placeManager.locationManager.startUpdatingLocation()
     }
 
+    @IBAction func displayRegion(sender: AnyObject) {
+        //-- Foreach region already monitored we delete it
+        for regionMonitored in self.placeManager.locationManager.monitoredRegions {
+            if let circularRegion = regionMonitored as? CLCircularRegion {
+                print(circularRegion.identifier)
+            }
+        }
+    }
 }
 

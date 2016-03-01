@@ -31,6 +31,7 @@ class Request {
     
     func userWithinPlace(url: String, f: (NSDictionary) -> ()) {
         do {
+            print(url)
             let request = NSMutableURLRequest(URL: NSURL(string: url)!)
             request.HTTPMethod = "POST"
             request.HTTPBody = try NSJSONSerialization.dataWithJSONObject(["object":"object"], options: .PrettyPrinted)
