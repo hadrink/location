@@ -26,13 +26,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
 
     @IBAction func createRegion(sender: UIButton) {
-        placeManager.requestState()
-        self.placeManager.locationManager.startUpdatingLocation()
+        self.placeManager.locationManager?.startUpdatingLocation()
     }
 
     @IBAction func displayRegion(sender: AnyObject) {
         //-- Foreach region already monitored we delete it
-        for regionMonitored in self.placeManager.locationManager.monitoredRegions {
+        for regionMonitored in self.placeManager.locationManager!.monitoredRegions {
             if let circularRegion = regionMonitored as? CLCircularRegion {
                 print(circularRegion.identifier)
             }

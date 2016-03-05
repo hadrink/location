@@ -15,21 +15,18 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     //-- Root constantes
     let request = Request()
     let userDefault = NSUserDefaults()
-    let locationManager = CLLocationManager()
+    var locationManager : CLLocationManager?
     
     //-- Root variables
     var regionToMonitorItems = [RegionToMonitor]()
     var userWithinPlace = false
     var latitude = CLLocationDegrees()
     var longitude = CLLocationDegrees()
+    var timer : NSTimer?
     
     //-- Initialize PlaceManager
     override init() {
         super.init()
-        locationManager.delegate = self
-        locationManager.allowsBackgroundLocationUpdates = true
-        locationManager.pausesLocationUpdatesAutomatically = false
-        
         // Set bool for key inside_region & george_clooney_inside if key doesn't exist
         if userDefault.objectForKey("inside_region") == nil {
             userDefault.setBool(false, forKey: "inside_region")
@@ -40,6 +37,34 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         }
         
         userDefault.synchronize()
+        
+        self.locationManager = PlaceManager.sharedLocationManager()
+        locationManager?.delegate = self
+        locationManager?.distanceFilter = kCLDistanceFilterNone
+        locationManager?.allowsBackgroundLocationUpdates = true
+        locationManager?.pausesLocationUpdatesAutomatically = false
+        self.timer = NSTimer.scheduledTimerWithTimeInterval(20.0,
+            target: self,
+            selector: "updateLocationWhenUserIsWithinRegion",
+            userInfo: nil,
+            repeats: true)
+        
+    }
+    
+    class func sharedLocationManager()->CLLocationManager? {
+        
+        struct Static {
+            static var _locationManager : CLLocationManager?
+        }
+        
+        objc_sync_enter(self)
+        if Static._locationManager == nil {
+            Static._locationManager = CLLocationManager()
+            Static._locationManager!.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        }
+        
+        objc_sync_exit(self)
+        return Static._locationManager!
     }
     
     //-- Method to start monitoring a region
@@ -49,7 +74,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         }
         
         let region = circularRegion(regionToMonitor)
-        locationManager.startMonitoringForRegion(region)
+        locationManager?.startMonitoringForRegion(region)
         print(region.identifier)
     }
     
@@ -65,7 +90,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     func createRegion() {
         
         //-- Check if monitored regions already exist
-        if locationManager.monitoredRegions.count != 0 {
+        if locationManager?.monitoredRegions.count != 0 {
             
             //-- Delete regions and empty the regionToMonitorItems
             stopMonitoringRegion()
@@ -106,7 +131,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
                                 let distanceInMeters = userCoordinatesDegrees.distanceFromLocation(regionCoordinatesDegrees)
                                 
                                 //-- Append regionToMonitorItems array with a RegionToMonitor object
-                                self.regionToMonitorItems.append(RegionToMonitor(coordinate: regionCoordinate, radius: 50, identifier: identifier!, distance: distanceInMeters))
+                                self.regionToMonitorItems.append(RegionToMonitor(coordinate: regionCoordinate, radius: 20, identifier: identifier!, distance: distanceInMeters))
                             } else {
                                 print("Object without loc")
                             }
@@ -124,7 +149,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         regionToMonitorItems.sortInPlace({ $0.distance < $1.distance })
         
         //-- Add only the nearest region
-        if regionToMonitorItems.count > 0 && locationManager.monitoredRegions.count == 0 {
+        if regionToMonitorItems.count > 0 && locationManager?.monitoredRegions.count == 0 {
             startMonitoringRegion(regionToMonitorItems.first!)
         }
         
@@ -136,43 +161,33 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         
         print("Did Update Location")
         
-        //-- Get Value for key inside_region & george_clooney_inside
-        let insideRegion = userDefault.boolForKey("inside_region")
-        let georgeClooneyInside = userDefault.boolForKey("george_clooney_inside")
-        
         //-- Get Location
         let location = locations.last
-        self.latitude = location!.coordinate.latitude
-        self.longitude = location!.coordinate.longitude
+        let newLatitude = location?.coordinate.latitude
+        let newLongitude = location?.coordinate.longitude
         
-        manager.stopUpdatingLocation()
+        self.latitude = newLatitude!
+        self.longitude = newLongitude!
         
-        //-- Check if user is region inside and place outside
-        if insideRegion && !georgeClooneyInside {
+        /*for (var i : Int = 0; i < locations.count; i++) {
+            let newLocation : CLLocation? = locations[i] as CLLocation
+            let location : CLLocationCoordinate2D = newLocation!.coordinate
+            let theAccuracy : CLLocationAccuracy = newLocation!.horizontalAccuracy
+            let locationAge : NSTimeInterval = newLocation!.timestamp.timeIntervalSinceNow
+            if locationAge > 30.0 {
+                continue
+            }
             
-            let notification = UILocalNotification()
-            notification.alertBody = "In Region but place outside"
-            notification.soundName = "Default"
-            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+            // Select only valid location and also location with good accuracy
+            if (newLocation != nil) && (theAccuracy > 0) && (theAccuracy < 2000) && !((location.latitude == 0.0) && (location.longitude == 0.0)) {
+                self.latitude = location.latitude
+                self.longitude = location.longitude
+            }
+        }*/
             
-            print("In region but place outside")
-            
-            //-- We stop the updating location
-            locationManager.stopUpdatingLocation()
-            
-            //-- We check if user is within place
-            checkUserIsWithinPlace()
-            
-            //-- We set the new value for key george_clooney_inside
-            userDefault.setBool(userWithinPlace, forKey: "george_clooney_inside")
-          
-        //-- Else we create regions
-        } else {
-            print("Object before monitoring \(self.locationManager.monitoredRegions.count)")
-            createRegion()
-            print("Object monitored \(self.locationManager.monitoredRegions.count)")
-        }
-        
+        print("Object before monitoring \(self.locationManager?.monitoredRegions.count)")
+        createRegion()
+        print("Object monitored \(self.locationManager?.monitoredRegions.count)")
     }
     
     //-- Method called when the location update failed
@@ -192,11 +207,11 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             print("DidStartMonitoringForRegion")
             print(region.identifier)
         
-            manager.requestStateForRegion(region)
+            locationManager?.requestStateForRegion(region)
         }
     }
     
-    //-- Method for determine the state of each region. Trigger by "locationManager.requestStateForRegion(region)"
+    //-- Method for determinate the state of each region. Trigger by "locationManager.requestStateForRegion(region)"
     func locationManager(manager: CLLocationManager, didDetermineState state: CLRegionState, forRegion region: CLRegion) {
         switch state {
         case .Inside:
@@ -207,7 +222,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             print("didDetermineState CLRegionState.Inside \(region.identifier)")
             
             //-- We stop monitoring for significant location changes
-            locationManager.stopMonitoringSignificantLocationChanges()
+            locationManager?.stopMonitoringSignificantLocationChanges()
             
             //-- We set true for key inside_region
             userDefault.setBool(true, forKey: "inside_region")
@@ -215,8 +230,6 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             //-- Sync the NSUserDefault
             userDefault.synchronize()
             
-            //-- We create a updating location timer
-            timerWithStartUpdating()
             
         case .Outside:
             let notification = UILocalNotification()
@@ -227,7 +240,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             print("Outside")
             
             //-- We stop updating location
-            locationManager.stopUpdatingLocation()
+            locationManager?.stopUpdatingLocation()
             
             //-- We set false for key inside_region
             userDefault.setBool(false, forKey: "inside_region")
@@ -239,7 +252,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             userDefault.synchronize()
             
             //-- We restart monitoring location changes for refresh regions
-            locationManager.startMonitoringSignificantLocationChanges()
+            locationManager?.startMonitoringSignificantLocationChanges()
             
         case .Unknown:
             let notification = UILocalNotification()
@@ -249,7 +262,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             print("didDetermineState CLRegionState.Unknown")
             
             //-- We stop updating location
-            locationManager.stopUpdatingLocation()
+            locationManager?.stopUpdatingLocation()
             
             //-- We set false for key inside_region
             userDefault.setBool(false, forKey: "inside_region")
@@ -261,7 +274,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             userDefault.synchronize()
             
             //-- We restart monitoring location changes for refresh regions
-            locationManager.startMonitoringSignificantLocationChanges()
+            locationManager?.startMonitoringSignificantLocationChanges()
         }
     }
     
@@ -272,33 +285,13 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         print(error.description)
     }
     
-    func timerWithStartUpdating() {
-        
-        //-- We get the bool for key george_clooney_inside
-        let georgeClooneyInside = userDefault.boolForKey("george_clooney_inside")
-        
-        //-- If george is place outside we start updating location and we create an alarm until george is outside
-        if !georgeClooneyInside {
-            
-            let notification = UILocalNotification()
-            notification.alertBody = "Create timer"
-            notification.soundName = "Default"
-            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
-            
-            print("create timer")
-            
-            locationManager.startUpdatingLocation()
-            let timerWithStartUpdating : Selector = "timerWithStartUpdating"
-            NSTimer.scheduledTimerWithTimeInterval(60*3, target: self, selector: timerWithStartUpdating, userInfo: nil, repeats: false)
-        }
-    }
     
     //-- Method called when the user did enter in the region
     func locationManager(manager: CLLocationManager, didEnterRegion region: CLRegion) {
         
         //-- We request region state
         if region.identifier == regionToMonitorItems.first?.identifier {
-            manager.requestStateForRegion(region)
+            locationManager?.requestStateForRegion(region)
             
             let notification = UILocalNotification()
             notification.alertBody = "Did Enter Region + \(region.identifier)"
@@ -313,7 +306,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         //-- We request region state
         if region.identifier == regionToMonitorItems.first?.identifier {
 
-            manager.requestStateForRegion(region)
+            locationManager?.requestStateForRegion(region)
         
             let notification = UILocalNotification()
             notification.alertBody = "Did Exit Region + \(region.identifier)"
@@ -327,10 +320,10 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     func stopMonitoringRegion() {
 
         //-- Foreach region already monitored we delete it
-        for regionMonitored in self.locationManager.monitoredRegions {
+        for regionMonitored in self.locationManager!.monitoredRegions {
             if let circularRegion = regionMonitored as? CLCircularRegion {
                 print(circularRegion.identifier)
-                self.locationManager.stopMonitoringForRegion(circularRegion)
+                self.locationManager?.stopMonitoringForRegion(circularRegion)
             }
         }
     }
@@ -339,10 +332,10 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     func requestState() {
         
         //-- Foreach region already monitored we get the state
-        for regionMonitored in self.locationManager.monitoredRegions {
+        for regionMonitored in self.locationManager!.monitoredRegions {
             if let circularRegion = regionMonitored as? CLCircularRegion {
                 print(circularRegion.identifier)
-                self.locationManager.requestStateForRegion(circularRegion)
+                self.locationManager?.requestStateForRegion(circularRegion)
             }
         }
     }
@@ -358,5 +351,40 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
                 self.userWithinPlace = success
             }
         })
+    }
+    
+    func updateLocationWhenUserIsWithinRegion() {
+        let georgeClooneyInside = userDefault.boolForKey("george_clooney_inside")
+        let insideRegion = userDefault.boolForKey("inside_region")
+        
+        if !georgeClooneyInside && insideRegion{
+            
+            let notification = UILocalNotification()
+            notification.alertBody = "In Region but place outside"
+            notification.soundName = "Default"
+            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+            
+            locationManager?.startUpdatingLocation()
+            locationManager?.allowsBackgroundLocationUpdates = true
+            locationManager?.pausesLocationUpdatesAutomatically = false
+            
+            //-- We check if user is within place
+            checkUserIsWithinPlace()
+            
+            //-- Stop updating location after check if user is within place
+            locationManager?.stopUpdatingLocation()
+            
+            //-- We set the new value for key george_clooney_inside
+            userDefault.setBool(userWithinPlace, forKey: "george_clooney_inside")
+            
+        } else {
+            locationManager?.stopUpdatingLocation()
+            locationManager?.startMonitoringSignificantLocationChanges()
+            BackgroundTask().endBackgroundTask()
+            if timer != nil {
+                timer?.invalidate()
+                timer = nil
+            }
+        }
     }
 }

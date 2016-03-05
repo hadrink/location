@@ -18,6 +18,7 @@
 		7A12E6B21C7B46BF00088177 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A12E6B11C7B46BF00088177 /* CoreLocation.framework */; };
 		7A12E6B61C7B4BF000088177 /* PlaceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12E6B51C7B4BF000088177 /* PlaceManager.swift */; };
 		7A12E6B81C7B4C9400088177 /* RequestAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12E6B71C7B4C9400088177 /* RequestAPI.swift */; };
+		7AF9ABF71C89F4B20075126E /* BackgroundTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF9ABF61C89F4B20075126E /* BackgroundTaskManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		7A12E6B11C7B46BF00088177 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		7A12E6B51C7B4BF000088177 /* PlaceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceManager.swift; sourceTree = "<group>"; };
 		7A12E6B71C7B4C9400088177 /* RequestAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestAPI.swift; sourceTree = "<group>"; };
+		7AF9ABF61C89F4B20075126E /* BackgroundTaskManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackgroundTaskManager.swift; path = ../BackgroundTaskManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 				7A12E6811C7B463300088177 /* AppDelegate.swift */,
 				7A12E6AF1C7B467200088177 /* RegionModel.swift */,
 				7A12E6B51C7B4BF000088177 /* PlaceManager.swift */,
+				7AF9ABF61C89F4B20075126E /* BackgroundTaskManager.swift */,
 				7A12E6B71C7B4C9400088177 /* RequestAPI.swift */,
 				7A12E6831C7B463300088177 /* ViewController.swift */,
 				7A12E6851C7B463300088177 /* Main.storyboard */,
@@ -278,6 +281,7 @@
 				7A12E6B61C7B4BF000088177 /* PlaceManager.swift in Sources */,
 				7A12E6B01C7B467200088177 /* RegionModel.swift in Sources */,
 				7A12E6B81C7B4C9400088177 /* RequestAPI.swift in Sources */,
+				7AF9ABF71C89F4B20075126E /* BackgroundTaskManager.swift in Sources */,
 				7A12E6821C7B463300088177 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

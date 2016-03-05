@@ -13,12 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     let placeManager = PlaceManager()
+    let backgroundTask = BackgroundTask()
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         
         let locationManager = placeManager.locationManager
-        locationManager.requestAlwaysAuthorization()
+        locationManager?.requestAlwaysAuthorization()
         
         if launchOptions?[UIApplicationLaunchOptionsLocationKey] != nil {
             
@@ -28,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             notification.soundName = "Default"
             UIApplication.sharedApplication().presentLocalNotificationNow(notification)
             
-            locationManager.startMonitoringSignificantLocationChanges()
+            locationManager?.startMonitoringSignificantLocationChanges()
             
         }
         
@@ -57,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //placeManager.locationManager.stopUpdatingLocation()
         
-        self.placeManager.locationManager.startMonitoringSignificantLocationChanges()
+        self.placeManager.locationManager?.startMonitoringSignificantLocationChanges()
 
         
     }
