@@ -54,25 +54,17 @@ class BackgroundTask : NSObject {
             userInfo: nil,
             repeats: true)
         
-        updateLocationEveryMinute = NSTimer.scheduledTimerWithTimeInterval(20.0,
-            target: PlaceManager(),
-            selector: "updateLocationWhenUserIsWithinRegion",
-            userInfo: nil,
-            repeats: true)
-        
         
         self.backgroundTaskIdentifier =
             application.beginBackgroundTaskWithName(backgroundTaskName,
                 expirationHandler: {[weak self] in
-                
-                    //-- Get Value for key inside_region & george_clooney_inside
-                    self!.updateLocationEveryMinute = NSTimer.scheduledTimerWithTimeInterval(20.0,
-                        target: PlaceManager(),
-                        selector: "updateLocationWhenUserIsWithinRegion",
-                        userInfo: nil,
-                        repeats: true)
-        
                     
+                    while(true) {
+                        
+                    }
+                    //-- When background task is finished continue to check if user is within
+                    PlaceManager().updateLocationWhenUserIsWithinRegion()
+        
                 })
     }
     
@@ -80,7 +72,6 @@ class BackgroundTask : NSObject {
         if backgroundTaskIdentifier != UIBackgroundTaskInvalid{
             endBackgroundTask()
         }
-        
     }
     
     

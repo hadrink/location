@@ -14,6 +14,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     
     //-- Root constantes
     let request = Request()
+    let bgTask = BackgroundTask()
     let userDefault = NSUserDefaults()
     var locationManager : CLLocationManager?
     
@@ -27,6 +28,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     //-- Initialize PlaceManager
     override init() {
         super.init()
+        
         // Set bool for key inside_region & george_clooney_inside if key doesn't exist
         if userDefault.objectForKey("inside_region") == nil {
             userDefault.setBool(false, forKey: "inside_region")
@@ -43,12 +45,6 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         locationManager?.distanceFilter = kCLDistanceFilterNone
         locationManager?.allowsBackgroundLocationUpdates = true
         locationManager?.pausesLocationUpdatesAutomatically = false
-        self.timer = NSTimer.scheduledTimerWithTimeInterval(20.0,
-            target: self,
-            selector: "updateLocationWhenUserIsWithinRegion",
-            userInfo: nil,
-            repeats: true)
-        
     }
     
     class func sharedLocationManager()->CLLocationManager? {
@@ -165,6 +161,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         let location = locations.last
         let newLatitude = location?.coordinate.latitude
         let newLongitude = location?.coordinate.longitude
+        let insideRegion = userDefault.boolForKey("inside_region")
         
         self.latitude = newLatitude!
         self.longitude = newLongitude!
@@ -185,9 +182,15 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             }
         }*/
             
-        print("Object before monitoring \(self.locationManager?.monitoredRegions.count)")
-        createRegion()
-        print("Object monitored \(self.locationManager?.monitoredRegions.count)")
+        
+        if !insideRegion {
+            print("Object before monitoring \(self.locationManager?.monitoredRegions.count)")
+            createRegion()
+            print("Object monitored \(self.locationManager?.monitoredRegions.count)")
+        } else {
+            locationManager?.stopUpdatingLocation()
+        }
+
     }
     
     //-- Method called when the location update failed
@@ -230,6 +233,11 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             //-- Sync the NSUserDefault
             userDefault.synchronize()
             
+            //-- Launch backgroundtask
+            bgTask.applicationBackgrounded()
+            
+            //-- Launch timer to get if user is within
+            timerToGetUserIsWithinRegion()
             
         case .Outside:
             let notification = UILocalNotification()
@@ -254,6 +262,9 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             //-- We restart monitoring location changes for refresh regions
             locationManager?.startMonitoringSignificantLocationChanges()
             
+            //-- Reset timer
+            timer?.invalidate()
+            
         case .Unknown:
             let notification = UILocalNotification()
             notification.alertBody = "Unknown"
@@ -275,6 +286,9 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             
             //-- We restart monitoring location changes for refresh regions
             locationManager?.startMonitoringSignificantLocationChanges()
+            
+            //-- Reset timer
+            timer?.invalidate()
         }
     }
     
@@ -357,6 +371,22 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         let georgeClooneyInside = userDefault.boolForKey("george_clooney_inside")
         let insideRegion = userDefault.boolForKey("inside_region")
         
+        let notification3 = UILocalNotification()
+        notification3.alertBody = "Launch timer"
+        notification3.soundName = "Default"
+        UIApplication.sharedApplication().presentLocalNotificationNow(notification3)
+        
+        let notification = UILocalNotification()
+        notification.alertBody = "Inside region\(insideRegion)"
+        notification.soundName = "Default"
+        UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+
+        let notification2 = UILocalNotification()
+        notification2.alertBody = "Inside polygon\(georgeClooneyInside)"
+        notification2.soundName = "Default"
+        UIApplication.sharedApplication().presentLocalNotificationNow(notification2)
+
+        
         if !georgeClooneyInside && insideRegion{
             
             let notification = UILocalNotification()
@@ -378,13 +408,34 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             userDefault.setBool(userWithinPlace, forKey: "george_clooney_inside")
             
         } else {
-            locationManager?.stopUpdatingLocation()
+            let notification = UILocalNotification()
+            notification.alertBody = "Background task killed"
+            notification.soundName = "Default"
+            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+            
+            //-- Reset timer
+            //timer?.invalidate()
+            
+            /*locationManager?.stopUpdatingLocation()
             locationManager?.startMonitoringSignificantLocationChanges()
             BackgroundTask().endBackgroundTask()
             if timer != nil {
                 timer?.invalidate()
                 timer = nil
-            }
+            }*/
         }
+    }
+    
+    func timerToGetUserIsWithinRegion() {
+
+        //-- Reset timer
+        timer?.invalidate()
+
+        //-- Timer for test user is within polygon
+        timer = NSTimer.scheduledTimerWithTimeInterval(20.0,
+            target: PlaceManager(),
+            selector: "updateLocationWhenUserIsWithinRegion",
+            userInfo: nil,
+            repeats: true)
     }
 }

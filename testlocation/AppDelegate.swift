@@ -14,6 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     let placeManager = PlaceManager()
     let backgroundTask = BackgroundTask()
+    //var timertest : NSTimer?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
@@ -30,6 +31,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UIApplication.sharedApplication().presentLocalNotificationNow(notification)
             
             locationManager?.startMonitoringSignificantLocationChanges()
+            /*timertest = NSTimer.scheduledTimerWithTimeInterval(20.0,
+                target: PlaceManager(),
+                selector: "updateLocationWhenUserIsWithinRegion",
+                userInfo: nil,
+                repeats: true)*/
             
         }
         
