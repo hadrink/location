@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>J'ai besoin de ta loc Bitch</string>
+	<string>J&apos;ai besoin de ta loc Bitch</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

@@ -15,6 +15,7 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
     //-- Root constantes
     let request = Request()
     let bgTask = BackgroundTask()
+    let app = UIApplication.sharedApplication()
     let userDefault = NSUserDefaults()
     var locationManager : CLLocationManager?
     
@@ -188,10 +189,14 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             createRegion()
             print("Object monitored \(self.locationManager?.monitoredRegions.count)")
         } else {
-            locationManager?.stopUpdatingLocation()
+            locationManager?.stopMonitoringSignificantLocationChanges()
         }
+        
+        print("Background time remaining")
+        print(UIApplication.sharedApplication().backgroundTimeRemaining)
 
     }
+    
     
     //-- Method called when the location update failed
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
@@ -233,8 +238,10 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             //-- Sync the NSUserDefault
             userDefault.synchronize()
             
-            //-- Launch backgroundtask
-            bgTask.applicationBackgrounded()
+            //-- Launch background if we need
+            if app.applicationState == UIApplicationState.Background  {
+                BackgroundTask().applicationBackgrounded()
+            }
             
             //-- Launch timer to get if user is within
             timerToGetUserIsWithinRegion()
@@ -385,7 +392,6 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
         notification2.alertBody = "Inside polygon\(georgeClooneyInside)"
         notification2.soundName = "Default"
         UIApplication.sharedApplication().presentLocalNotificationNow(notification2)
-
         
         if !georgeClooneyInside && insideRegion{
             
@@ -394,15 +400,18 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             notification.soundName = "Default"
             UIApplication.sharedApplication().presentLocalNotificationNow(notification)
             
+            //-- hold background task
+            locationManager?.startMonitoringSignificantLocationChanges()
+            
+            //-- Get a new location
             locationManager?.startUpdatingLocation()
+            
+            //-- Allow background updates == true && pauses location updates automatically == false
             locationManager?.allowsBackgroundLocationUpdates = true
             locationManager?.pausesLocationUpdatesAutomatically = false
             
             //-- We check if user is within place
             checkUserIsWithinPlace()
-            
-            //-- Stop updating location after check if user is within place
-            locationManager?.stopUpdatingLocation()
             
             //-- We set the new value for key george_clooney_inside
             userDefault.setBool(userWithinPlace, forKey: "george_clooney_inside")
@@ -414,15 +423,14 @@ class PlaceManager : NSObject, CLLocationManagerDelegate {
             UIApplication.sharedApplication().presentLocalNotificationNow(notification)
             
             //-- Reset timer
-            //timer?.invalidate()
+            timer?.invalidate()
             
-            /*locationManager?.stopUpdatingLocation()
-            locationManager?.startMonitoringSignificantLocationChanges()
-            BackgroundTask().endBackgroundTask()
-            if timer != nil {
-                timer?.invalidate()
-                timer = nil
-            }*/
+            //-- Stop updating location after check if user is within place
+            locationManager?.stopUpdatingLocation()
+            
+            //-- End background task
+            bgTask.endBackgroundTask()
+
         }
     }
     
